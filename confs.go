@@ -1,4 +1,4 @@
-package gutils
+package confs
 
 import (
 	"io/ioutil"
