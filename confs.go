@@ -6,22 +6,34 @@ import (
 	"strings"
 	"encoding/json"
 	"path"
+	"path/filepath"
 )
 
 var all map[string](map[string]interface{})
 
 const (
-	dir_conf  = "conf"
-	json_file = "json"
+	default_conf_root = "conf"
+	json_file         = "json"
 
 	conf_locale = "locale"
 	top_conf    = "top"
 )
 
-func init() {
+var confRoot string
+
+func SetConfDir(confDir string) {
+	confRoot = filepath.Clean(confDir)
+	//re load confs
+	loadConfs()
+}
+
+func loadConfs() {
+	if len(confRoot) == 0 {
+		confRoot = default_conf_root
+	}
 	all = make(map[string](map[string]interface{}))
 
-	files, err := ioutil.ReadDir(dir_conf)
+	files, err := ioutil.ReadDir(confRoot)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -38,8 +50,12 @@ func init() {
 	}
 }
 
+func init() {
+	loadConfs()
+}
+
 func readConfByJson(fileName string) {
-	bs, err := ioutil.ReadFile(dir_conf + "/" + fileName)
+	bs, err := ioutil.ReadFile(confRoot + "/" + fileName)
 	if err != nil {
 		log.Println(err)
 	}
